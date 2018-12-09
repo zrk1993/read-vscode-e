@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>reader</title>
+    <script src="@../../lib/jszip.js"></script>
+    <script src="@../../lib/epub.js"></script>
+</head>
+<body>
+    <select id="toc"></select>
+    <div id="area"></div>
+    <div>
+        <input id="current-percent" size="3" value="0" /> %
+        <button id="prev">prev</button>
+        <button id="next">next</button>
+    </div>
+    <!-- <iframe src="https://epub.yunser.com/books/1544247886078" frameborder="0" style="width: 100%; height: 100%;"></iframe> -->
+</body>
+<script>
+    var book = ePub("@../../book/追风筝的人.epub");
+    var rendition = book.renderTo("area", {width: '100%', height: '400', flow: "paginated"});
+    var displayed = rendition.display();
+
+    rendition.themes.default({
+      body: {
+        'font-size': '16px',
+        color: 'rgb(212,212,212)',
+      },
+    });
+
+    book.locations.generate(1600);
+
+    
+
+    var currentPage = document.getElementById("current-percent");
+    currentPage.addEventListener("change", function(){
+        var cfi = book.locations.cfiFromPercentage(currentPage.value/100);
+        debugger
+        rendition.display(cfi);
+    }, false);
+
+
+    displayed.then(function(){
+        // Get the current CFI
+        var currentLocation = rendition.currentLocation();
+        // Get the Percentage (or location) from that CFI
+        var currentPage = book.locations.percentageFromCfi(currentLocation.start.cfi);
+        currentPage.value = currentPage;
+    });
+
+    rendition.on('relocated', function(location){
+        debugger
+        var percent = book.locations.percentageFromCfi(location.start.cfi);
+        var percentage = Math.floor(percent * 100);
+        currentPage.value = percentage;
+        console.log(percentage);
+    });
+
+
+    book.loaded.navigation.then(toc => {
+        var $select = document.getElementById("toc"),
+            docfrag = document.createDocumentFragment();
+        toc.forEach(function(chapter) {
+            var option = document.createElement("option");
+            option.textContent = chapter.label;
+            option.ref = chapter.href;
+            docfrag.appendChild(option);
+        });
+        $select.appendChild(docfrag);
+
+        $select.onchange = function(){
+            const ref = $select.options[$select.selectedIndex].ref;
+            rendition.display(ref);
+            console.log(ref);            
+            return false;
+        };
+    });
+
+
+    var next = document.getElementById("next");
+    next.addEventListener("click", function(){
+      rendition.next();
+    }, false);
+    var $prev = document.getElementById("prev");
+    $prev.addEventListener("click", function(){
+        rendition.prev();
+    }, false);
+</script>
+</html>

@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>bookShelf</title>
+    <script src="@../../lib/jquery-3.3.1.min.js"></script>
+    <script src="@../utils/WebviewMessageHelper.js"></script>
+    <style>
+            #books {
+                padding: 0;
+                margin: 15px 0 0 0;
+            }
+            #books li {
+                cursor: pointer;
+                padding: 3px 10px;
+                list-style:none;
+            }
+            #books li.active {
+                color: #3794ff !important;
+            }
+            #books li:hover {
+                background: rgba(0, 0, 0, .5);
+            }
+            #books li[isdirectory=true] {
+                color: aqua;
+            }
+        </style>
+</head>
+<body>
+    <div>
+        <button id="addBook">添加</button>
+        <button id="delBook">删除</button>
+    </div>
+    <div>
+        <ul id="books">
+
+        </ul>
+    </div>
+<script>
+(function() {
+    const vscode = acquireVsCodeApi();
+    const webviewMessageHelper = new WebviewMessageHelper(vscode);
+
+    const $books = $("#books");
+
+    function getBooks() {
+        webviewMessageHelper.emit({ command: 'getBook' }, (res) => {
+            const books = res.data;
+            if (books) {
+                const items = books.map((item) => {
+                    return `<li path="${item.path}">${item.name}</li>`;
+                });
+                $books.html(items.join(''));
+            }
+        });
+    }
+
+    $books.on('click', 'li', function() {
+        $books.find('li').removeClass('active');
+        $(this).addClass('active');
+    });
+    $books.on('dblclick', 'li', function() {
+        const book = $(this).text();
+        webviewMessageHelper.emit({ command: 'reader', name: book });
+    });
+
+    $('#addBook').click(function() {
+        webviewMessageHelper.emit({ command: 'redirection', path: 'selectFile' });
+    });
+
+    $('#delBook').click(function() {
+        const $slt = $books.find('li.active');
+        if ($slt) {
+            webviewMessageHelper.emit({ command: 'delBook', name: $slt.text() }, () => {
+                getBooks();
+            });
+        }
+    });
+
+
+
+    getBooks();
+}());
+</script>
+</body>
+</html>
