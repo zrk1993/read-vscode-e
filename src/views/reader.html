@@ -4,59 +4,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>reader</title>
+    <script src="@../../lib/jquery-3.3.1.min.js"></script>
     <script src="@../../lib/jszip.js"></script>
     <script src="@../../lib/epub.js"></script>
+    <script src="@../utils/WebviewMessageHelper.js"></script>
+
+    <style>
+        .main {
+            position: relative;
+        }
+        .main #prev,
+        .main #next {
+            position: absolute;
+            cursor: pointer;
+            top: 30%;
+            bottom: 30%;
+        }
+        .main #prev {
+            left: 0;
+            right: 30%;
+        }
+        .main #next {
+            left: 70%;
+            right: 0%;
+        }
+    </style>
+
 </head>
 <body>
-    <select id="toc"></select>
-    <div id="area"></div>
     <div>
-        <input id="current-percent" size="3" value="0" /> %
-        <button id="prev">prev</button>
-        <button id="next">next</button>
+        <button id="back">back</button>
+        <select id="toc"></select>
+        <span id="current-percent">{{ progress }}</span>
+    </div>
+    <div class="main">
+        <div id="area">
+
+        </div>
+        <div id="prev"></div>
+        <div id="next"></div>
     </div>
 </body>
 <script>
-    var book = ePub('{{ bookpath }}');
-    var rendition = book.renderTo("area", {width: '100%', height: '400', flow: "paginated"});
-    var displayed = rendition.display();
+    const bookName = '{{ bookName }}';
+    const bookProgress = '{{ progress }}';
+    const cfi =  '{{ cfi }}' && '{{ cfi }}' !== 'undefined' ? '{{ cfi }}' : undefined;
+    const vscode = acquireVsCodeApi();
+    const webviewMessageHelper = new WebviewMessageHelper(vscode);
+    const book = ePub('{{ bookPath }}');
+    const rendition = book.renderTo("area", {width: '100%', height: '500', flow: "paginated"});
+    const displayed = rendition.display(cfi);
 
+    // 设置样式
     rendition.themes.default({
       body: {
         'font-size': '16px',
-        color: 'rgb(212,212,212)',
+        color: 'rgb(222,222,222)',
       },
     });
 
-    book.locations.generate(1600);
-
-    
-
-    var currentPage = document.getElementById("current-percent");
-    currentPage.addEventListener("change", function(){
-        var cfi = book.locations.cfiFromPercentage(currentPage.value/100);
-        debugger
-        rendition.display(cfi);
-    }, false);
-
-
-    displayed.then(function(){
-        // Get the current CFI
-        var currentLocation = rendition.currentLocation();
-        // Get the Percentage (or location) from that CFI
-        var currentPage = book.locations.percentageFromCfi(currentLocation.start.cfi);
-        currentPage.value = currentPage;
-    });
-
+    //  时时保存阅读进度
     rendition.on('relocated', function(location){
-        debugger
-        var percent = book.locations.percentageFromCfi(location.start.cfi);
-        var percentage = Math.floor(percent * 100);
-        currentPage.value = percentage;
-        console.log(percentage);
+        const cfi = location.start.cfi;
+        const progress = book.locations.percentageFromCfi(cfi).toFixed(4);
+        $('#current-percent').html(progress || bookProgress);
+        webviewMessageHelper.emit({ command: 'update:readerProgress', book: bookName, progress, cfi });
     });
 
+    book.ready.then(function() {
+        const locations = book.locations.generate(1600); // 很慢，后面可以考虑存起来
+		return locations;
+	});
 
+    // 加载目录
     book.loaded.navigation.then(toc => {
         var $select = document.getElementById("toc"),
             docfrag = document.createDocumentFragment();
@@ -70,20 +90,22 @@
 
         $select.onchange = function(){
             const ref = $select.options[$select.selectedIndex].ref;
-            rendition.display(ref);
-            console.log(ref);            
+            rendition.display(ref);        
             return false;
         };
     });
 
 
-    var next = document.getElementById("next");
-    next.addEventListener("click", function(){
-      rendition.next();
-    }, false);
-    var $prev = document.getElementById("prev");
-    $prev.addEventListener("click", function(){
+    $('#prev').click(function() {
         rendition.prev();
-    }, false);
+    });
+
+    $('#next').click(function() {
+        rendition.next();
+    });
+
+    $('#back').click(function() {
+        webviewMessageHelper.emit({ command: 'goto:index' });
+    });
 </script>
 </html>
