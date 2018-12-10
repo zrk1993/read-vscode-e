@@ -13,18 +13,18 @@
         .main {
             position: relative;
         }
-        .main #prev,
-        .main #next {
+        .main .prev-page,
+        .main .next-page {
             position: absolute;
             cursor: pointer;
             top: 30%;
             bottom: 30%;
         }
-        .main #prev {
+        .main .prev-page {
             left: 0;
             right: 30%;
         }
-        .main #next {
+        .main .next-page {
             left: 70%;
             right: 0%;
         }
@@ -41,8 +41,12 @@
         <div id="area">
 
         </div>
-        <div id="prev"></div>
-        <div id="next"></div>
+        <div class="prev-page"></div>
+        <div class="next-page"></div>
+    </div>
+    <div>
+        <button class="prev-page">prev</button>
+        <button class="next-page" style="float: right;">next</button>
     </div>
 </body>
 <script>
@@ -96,11 +100,11 @@
     });
 
 
-    $('#prev').click(function() {
+    $('.prev-page').click(function() {
         rendition.prev();
     });
 
-    $('#next').click(function() {
+    $('.next-page').click(function() {
         rendition.next();
     });
 
