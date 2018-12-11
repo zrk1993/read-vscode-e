@@ -19,9 +19,15 @@
         "commands": [
             {
                 "command": "extension.reader",
-                "title": "reader"
+                "title": "reader",
+                "icon": "icon.png"
             }
-        ]
+        ],
+        "keybindings": [{
+            "command": "extension.reader",
+            "key": "ctrl+d",
+            "mac": "cmd+d"
+        }]
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",

@@ -9,24 +9,43 @@ const ExtensionMessageHelper = require('./utils/ExtensionMessageHelper');
 const getWebViewContent = require('./utils/getWebViewContent');
 const MyStorage = require('./utils/MyStorage');
 
+let currentPanel = null;
+
 function activate(context) {
 
     let disposable = vscode.commands.registerCommand('extension.reader', function () {
+
+        if (currentPanel && currentPanel.visible) {
+            currentPanel.dispose();
+            return;
+        }
 
         const webviewOptions = {
             enableScripts: true, // 启用JS，默认禁用
             retainContextWhenHidden: true, // webview被隐藏时保持状态，避免被重置
         };
-        const panel = vscode.window.createWebviewPanel('reader', "reader", vscode.ViewColumn.One, webviewOptions);
         
-        panel.webview.html = getWebViewContent({
+        const columnToShowIn = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.Two;
+        if (currentPanel) {
+            currentPanel.reveal(columnToShowIn);
+            return;
+        }
+
+        currentPanel = vscode.window.createWebviewPanel('reader', "reader", vscode.ViewColumn.Two, webviewOptions);
+
+        // Reset when the current panel is closed
+        currentPanel.onDidDispose(() => {
+            currentPanel = undefined;
+        }, null, context.subscriptions);
+
+        currentPanel.webview.html = getWebViewContent({
             rootPath: context.extensionPath,
             htmlPath: 'src/views/index.html',
         });
 
         const storage = new MyStorage({ rootPath: context.extensionPath });
 
-        const extensionMessageHelper = new ExtensionMessageHelper(panel.webview, context);
+        const extensionMessageHelper = new ExtensionMessageHelper(currentPanel.webview, context);
 
         // 获取book目录下的所有书本
         extensionMessageHelper.on('getBook', (data, done) => {
@@ -37,7 +56,7 @@ function activate(context) {
 
         // 去首页
         extensionMessageHelper.on('goto:index', () => {
-            panel.webview.html = getWebViewContent({
+            currentPanel.webview.html = getWebViewContent({
                 rootPath: context.extensionPath,
                 htmlPath: 'src/views/index.html',
             });
@@ -52,7 +71,7 @@ function activate(context) {
                 bookPath: vscode.Uri.file(Path.join(context.extensionPath, 'book', bookName)).with({ scheme: 'vscode-resource' }).toString(),
                 ...book
             };
-            panel.webview.html = getWebViewContent({
+            currentPanel.webview.html = getWebViewContent({
                 rootPath: context.extensionPath,
                 htmlPath: 'src/views/reader.html',
                 data: param,

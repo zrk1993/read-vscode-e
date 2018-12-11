@@ -1,0 +1,11 @@
+html, body {
+    padding: 0;
+    margin: 0;
+}
+
+.hover-show .hover-show-target {
+    visibility: hidden;
+}
+.hover-show:hover .hover-show-target {
+    visibility: visible;
+}
