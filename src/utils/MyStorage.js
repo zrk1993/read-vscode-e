@@ -27,18 +27,6 @@ class MyStorage {
         this._save();
     }
     
-    _get() {
-        let obj = {};
-        try {
-            let data = Fs.readFileSync(this.dataStoragePath, 'utf8');
-            if (!data) data = '{}';
-            obj = JSON.parse(data);
-        } catch (error) {
-            debugger
-        }
-        return obj;
-    }
-    
     _save() {
         const data = JSON.stringify(this._data);
         Fs.writeFileSync(this.dataStoragePath, data);

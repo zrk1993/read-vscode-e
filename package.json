@@ -1,11 +1,12 @@
 {
     "name": "reader",
-    "displayName": "vsc-extension",
+    "displayName": "epub reader",
     "description": "read webview",
     "version": "0.0.1",
     "publisher": "renkun",
+    "icon": "icon.png",
     "engines": {
-        "vscode": "^1.0.0"
+        "vscode": "^1.25.0"
     },
     "categories": [
         "Other"
@@ -26,13 +27,13 @@
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test"
     },
-    "devDependencies": {
-        "typescript": "^3.1.4",
-        "vscode": "^1.1.25",
-        "eslint": "^4.11.0",
-        "@types/node": "^8.10.25",
-        "@types/mocha": "^2.2.42"
-    },
-    "dependencies": {
-    }
+	"dependencies": {
+		"vscode": "^1.1.18"
+	},
+	"devDependencies": {
+        "vsce": "^1.53.2",
+		"@types/node": "^10.5.2",
+		"tslint": "^5.11.0",
+		"typescript": "^2.9.2"
+	}
 }
