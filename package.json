@@ -25,8 +25,8 @@
         ],
         "keybindings": [{
             "command": "extension.reader",
-            "key": "ctrl+d",
-            "mac": "cmd+d"
+            "key": "ctrl+3",
+            "mac": "cmd+3"
         }]
     },
     "scripts": {

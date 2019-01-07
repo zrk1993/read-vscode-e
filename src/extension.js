@@ -38,11 +38,6 @@ function activate(context) {
             currentPanel = undefined;
         }, null, context.subscriptions);
 
-        currentPanel.webview.html = getWebViewContent({
-            rootPath: context.extensionPath,
-            htmlPath: 'src/views/index.html',
-        });
-
         const storage = new MyStorage({ rootPath: context.extensionPath });
 
         const extensionMessageHelper = new ExtensionMessageHelper(currentPanel.webview, context);
@@ -54,22 +49,33 @@ function activate(context) {
             });
         });
 
+        const defaultConfig = { fontSize: 14, fontColor: '#ffffff' };
+
         // 去首页
-        extensionMessageHelper.on('goto:index', () => {
+        const toIndex = () => {
+            const config = storage.getItem('config') || defaultConfig;
             currentPanel.webview.html = getWebViewContent({
                 rootPath: context.extensionPath,
                 htmlPath: 'src/views/index.html',
+                data: {
+                    ...config
+                },
             });
-        });
+        };
+
+        // 去首页
+        extensionMessageHelper.on('goto:index', toIndex);
 
         // 跳转到阅读界面
         extensionMessageHelper.on('reader', (data, done) => {
             const bookName = data.book;
             const book = storage.getItem(bookName) || { bookName };
             book.progress = book.progress || 0;
+            const config = storage.getItem('config') || defaultConfig;
             const param = {
                 bookPath: vscode.Uri.file(Path.join(context.extensionPath, 'book', bookName)).with({ scheme: 'vscode-resource' }).toString(),
-                ...book
+                ...book,
+                ...config
             };
             currentPanel.webview.html = getWebViewContent({
                 rootPath: context.extensionPath,
@@ -91,6 +97,13 @@ function activate(context) {
 
             storage.setItem(bookName, book);
         });
+
+        // 更新配置
+        extensionMessageHelper.on('config', (data, done) => {
+            storage.setItem('config', data.config);
+        });
+
+        toIndex();
     });
 
     context.subscriptions.push(disposable);

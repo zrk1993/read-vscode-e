@@ -33,6 +33,13 @@
         <ul id="books">
 
         </ul>
+        <div class="hover-show">
+            <div class="hover-show-target">
+                <input type="number" name="fontSize" value="{{ fontSize }}">
+                <input type="color" name="fontColor" value="{{ fontColor }}">
+                <button id="save">save</button>
+            </div>
+        </div>
     </div>
 <script>
 (function() {
@@ -56,6 +63,14 @@
     $books.on('dblclick', 'li', function() {
         const book = $(this).text();
         webviewMessageHelper.emit({ command: 'reader', book });
+    });
+
+    $('#save').click(function() {
+        var config = {
+            fontColor: $('[name=fontColor]').val(),
+            fontSize: $('[name=fontSize]').val(),
+        };
+        webviewMessageHelper.emit({ command: 'config', config });
     });
 
     getBooks();

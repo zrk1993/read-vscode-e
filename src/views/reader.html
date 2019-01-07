@@ -43,7 +43,7 @@
 </head>
 <body class="layout">
     <div class="hover-show">
-        <button id="back" class="hover-show-target">back</button>
+        <button id="back" >back</button>
         <select id="toc" class="hover-show-target"></select>
         <span id="current-percent" style="float: right;">{{ progress }}</span>
     </div>
@@ -62,14 +62,18 @@
     const vscode = acquireVsCodeApi();
     const webviewMessageHelper = new WebviewMessageHelper(vscode);
     const book = ePub('{{ bookPath }}');
-    const rendition = book.renderTo("area", {width: '100%', height: Math.min(document.documentElement.clientHeight, 600) * .8, flow: "paginated"});
+    const rendition = book.renderTo("area", {
+        width: '100%',
+        height: document.documentElement.clientHeight * .9,
+        flow: "paginated"
+    });
     const displayed = rendition.display(cfi);
 
     // 设置样式
     rendition.themes.default({
       body: {
-        'font-size': '16px',
-        color: 'rgb(222,222,222)',
+        'font-size': '{{ fontSize }}px',
+        color: '{{ fontColor }}',
       },
     });
 
