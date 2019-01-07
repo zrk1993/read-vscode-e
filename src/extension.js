@@ -49,7 +49,7 @@ function activate(context) {
             });
         });
 
-        const defaultConfig = { fontSize: 14, fontColor: '#ffffff' };
+        const defaultConfig = { fontSize: 14, fontColor: '#6a9955' };
 
         // 去首页
         const toIndex = () => {
