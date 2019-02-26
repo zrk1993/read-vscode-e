@@ -60,7 +60,7 @@
         });
     }
 
-    $books.on('dblclick', 'li', function() {
+    $books.on('click', 'li', function() {
         const book = $(this).text();
         webviewMessageHelper.emit({ command: 'reader', book });
     });
