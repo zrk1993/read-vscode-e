@@ -23,3 +23,4 @@ A vscode extension for study
 
 - 字体设置功能鼠标hover才出现在书本目录下面
 - 书籍目录在阅读界面上方
+- 键盘AD翻页
