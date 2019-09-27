@@ -3,7 +3,8 @@
 A vscode extension for study
 
 插件地址: https://marketplace.visualstudio.com/items?itemName=renkun.reader
-githu: https://github.com/my-soul/read-vscode-e
+
+github: https://github.com/my-soul/read-vscode-e
 
 安装: 搜索插件epub reader
 
