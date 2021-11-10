@@ -4,7 +4,7 @@ A vscode extension for study
 
 插件地址: https://marketplace.visualstudio.com/items?itemName=renkun.reader
 
-github: https://github.com/my-soul/read-vscode-e
+github: https://github.com/zrk1993/read-vscode-e
 
 安装: 搜索插件epub reader
 
@@ -19,7 +19,7 @@ github: https://github.com/my-soul/read-vscode-e
 
 ## 书架编辑
 
-由于vscode安全策略，书架编辑请在插件安装目录 win:[C:\Users\ 你的用户名\.vscode\extensions\renkun.reader\book],mac:[~/.vscode/extensions/renkun.reader/book] 下自行增删书本
+由于vscode安全策略，书架编辑请在插件安装目录 win:[C:\Users\ 你的用户名\.vscode\extensions\kun.reader\book],mac:[~/.vscode/extensions/kun.reader/book] 下自行增删书本
 
 ## notice
 
